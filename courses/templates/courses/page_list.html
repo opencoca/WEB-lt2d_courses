@@ -1,0 +1,20 @@
+{% extends "courses/page_base.html" %}
+
+{% block title %}
+    Pages
+{% endblock %}
+
+{% block content %}
+    <h1>Pages</h1>
+    <h2><a href={% url "courses:page_create" %}>Create new Page</a></h2>
+    <ul>
+    {% for page in page_list %}
+        <li><a href={% url "courses:page_detail" page.pk %}>{{ page }}</a> | <a href={% url "courses:page_update" page.pk %}>Update</a> | <form style="display:inline;" action={% url "courses:page_delete" page.pk %} method="post" onsubmit="return confirm('Are you sure you want to delete {{ page }}?')">{% csrf_token %}
+    <input type="submit" value="Delete" />
+    </form></li>
+    {% empty %}
+        <li>No Pages yet.</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+

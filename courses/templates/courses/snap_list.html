@@ -1,0 +1,23 @@
+{% extends "courses/snap_base.html" %}
+
+{% block title %}
+Snaps
+{% endblock %}
+
+{% block content %}
+<h1>Snaps</h1>
+<h2>{% if user.is_staff %}<a href={% url "courses:snap_create" %}>Add a Snap Project</a>{% endif %}</h2>
+<ol>
+    {% for snap in snap_list %}
+    <li><a href={% url "courses:snap_detail" snap.slug %}>{{ snap.title }}</a>
+        {% if user.is_staff %}|
+        <a href={% url "courses:snap_update" snap.slug %}>Update</a>
+        |<form style="display:inline;" action={% url "courses:snap_delete" snap.slug %} method="post"
+            onsubmit="return confirm('Are you sure you want to delete {{ snap }}?')">{% csrf_token %}
+            <input type="submit" value="Delete" />
+        </form>{% endif %}</li>
+    {% empty %}
+    <li>No Snaps yet.</li>
+    {% endfor %}
+</ol>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "courses/syllabus_base.html" %}
+
+{% block title %}
+    {{ syllabus }}
+{% endblock %}
+
+{% block content %}
+    <h1><a href={% url "courses:syllabus_list" %}>Syllabus</a></h1>
+    <h2>{{ syllabus }} | <a href={% url "courses:syllabus_update" syllabus.slug %}>Update</a> | 
+    <form style="display:inline;" action={% url "courses:syllabus_delete" syllabus.slug %} method="post" onsubmit="return confirm('Are you sure you want to delete {{ syllabus }}?')">{% csrf_token %}
+    <input type="submit" value="Delete" />
+    </form>
+    </h2>
+{% endblock %}

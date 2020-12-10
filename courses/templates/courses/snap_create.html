@@ -1,0 +1,16 @@
+{% extends "courses/snap_base.html" %}
+
+{% block title %}
+    Create a new Snap! Project
+{% endblock %}
+
+{% block content %}
+<h1><a href={% url "courses:snap_list" %}>Snaps</a></h1>
+<h2>Create a new Snap! Project</h2>
+
+<form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create" />
+</form>
+<a href={% url "courses:snap_list" %}>Cancel</a>
+{% endblock %}

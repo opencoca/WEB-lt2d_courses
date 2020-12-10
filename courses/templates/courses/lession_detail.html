@@ -1,0 +1,14 @@
+{% extends "courses/lession_base.html" %}
+
+{% block title %}
+    {{ lession }}
+{% endblock %}
+
+{% block content %}
+    <h1><a href={% url "courses:lession_list" %}>Lession</a></h1>
+    <h2>{{ lession }} | <a href={% url "courses:lession_update" lession.pk %}>Update</a> | 
+    <form style="display:inline;" action={% url "courses:lession_delete" lession.pk %} method="post" onsubmit="return confirm('Are you sure you want to delete {{ lession }}?')">{% csrf_token %}
+    <input type="submit" value="Delete" />
+    </form>
+    </h2>
+{% endblock %}

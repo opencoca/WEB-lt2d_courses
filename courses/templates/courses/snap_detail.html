@@ -1,0 +1,22 @@
+{% extends "courses/snap_base.html" %}
+
+{% block title %}
+{{ snap }}
+{% endblock %}
+
+{% block content %}
+<h1><a href={% url "courses:snap_list" %}>Snaps</a></h1>
+<h2>{{ snap }}
+  {% if user.is_staff %}| <a href={% url "courses:snap_update" snap.slug %}>Update</a> |
+  <form style="display:inline;" action={% url "courses:snap_delete" snap.slug %} method="post"
+    onsubmit="return confirm('Are you sure you want to delete {{ snap }}?')">{% csrf_token %}
+    <input type="submit" value="Delete" />
+  </form> {% endif %}
+</h2>
+<div class="full-width" style="background-image: url('/static/imgs/loader.gif');
+  background-size: contain">
+  <iframe src="/static/snap/Snap.html" scrolling="no" class="iframe-clipped" id="snapFrame" project_path="/media/{{ snap.file }}"
+    show_palette="True" {% comment %} block_size="2" {% endcomment %}
+    style="width:100%;height:100%; border-width:0; opacity: 0; transition-duration 0.5s" onload="this.style.opacity = '1';"></iframe>
+</div>
+{% endblock %}

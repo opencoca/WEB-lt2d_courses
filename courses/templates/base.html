@@ -1,0 +1,28 @@
+{% load static %}
+<html>
+  <head>
+    <title>Oursite</title>
+    <link rel="stylesheet"  type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'css/style.less' %}" />
+  </head>
+  <body style="margin: 0;">
+    <div class="page-header">
+      <h1><a href="/courses/">Courses</a></h1>
+    </div>
+
+    <div id="swup" class="content container transition-fade">
+      <div class="row">
+        <div class="col-md-8">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>
+    <script>const swup = new Swup();</script>
+
+    <script src="//cdn.jsdelivr.net/npm/less" ></script>
+  </body>
+</html>
