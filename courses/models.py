@@ -105,16 +105,17 @@ class Snap(models.Model):
     description = models.CharField(max_length=500)
     page = models.ManyToManyField(Lession, blank=True)
     slug = models.SlugField(unique=True, blank=True)
+    my_order = models.PositiveIntegerField(default=0, blank=False, null=False)
     file = models.FileField(upload_to='snap/%Y/%m/%d/', null=True, verbose_name="")
 #    timestamp  = models.DateTimeField('date published')
 #    timestamp.editable = True
 
     class Meta:
-        ordering = ['slug']
+        ordering = ['my_order']
 
     def get_absolute_url(self):
         return reverse ("snap_detail", kwargs={"slug":self.slug})
 
     def __str__(self):
-        return self.title + ": " + str(self.id)
+        return self.title + ": " + str(self.my_order)
 

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Syllabus, Course, Lession, Page, Snap
 from django_baker.admin import ExtendedModelAdminMixin
+from adminsortable2.admin import SortableAdminMixin
 
 
 class SyllabusAdmin(ExtendedModelAdminMixin, admin.ModelAdmin):
@@ -62,8 +63,8 @@ class PageAdmin(ExtendedModelAdminMixin, admin.ModelAdmin):
     formfield_overrides = {}
     readonly_fields = []
 
-
-class SnapAdmin(ExtendedModelAdminMixin, admin.ModelAdmin):
+@admin.register(Snap)
+class SnapAdmin(SortableAdminMixin, ExtendedModelAdminMixin, admin.ModelAdmin):
     extra_list_display = []
     extra_list_filter = []
     extra_search_fields = []
@@ -77,9 +78,7 @@ class SnapAdmin(ExtendedModelAdminMixin, admin.ModelAdmin):
     formfield_overrides = {}
     readonly_fields = []
 
-
 admin.site.register(Syllabus, SyllabusAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Lession, LessionAdmin)
 admin.site.register(Page, PageAdmin)
-admin.site.register(Snap, SnapAdmin)
