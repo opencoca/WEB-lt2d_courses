@@ -151,7 +151,7 @@ class SnapCreateView(CreateView):
 class SnapUpdateView(UpdateView):
     model = Snap
     form_class = SnapForm
-    # fields = ['title', 'subtile', 'description', 'slug', 'file']
+    #fields = ['title', 'subtile', 'description', 'slug', 'file','http_only']
     template_name = "courses/snap_update.html"
     initial = {}
     slug_field = 'slug'

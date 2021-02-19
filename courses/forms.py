@@ -178,7 +178,7 @@ class SnapForm(forms.ModelForm):
 
     class Meta:
         model = Snap
-        fields = ['title', 'subtile', 'description', 'slug', 'file']
+        fields = ['title', 'subtile', 'description', 'slug','http_only', 'file']
         exclude = []
         widgets = None
         localized_fields = None

@@ -107,6 +107,7 @@ class Snap(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     my_order = models.PositiveIntegerField(default=0, blank=False, null=False)
     file = models.FileField(upload_to='snap/%Y/%m/%d/', null=True, verbose_name="")
+    http_only = models.BooleanField(default=False, blank=False, null=False)
 #    timestamp  = models.DateTimeField('date published')
 #    timestamp.editable = True
 
