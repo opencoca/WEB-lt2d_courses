@@ -1,5 +1,5 @@
 # lt2d_courses
-## LT2D Courses allows for the creation and managgment of Courses materieals 
+## LT2D Courses allows for the creation and management of course materials
 ### not to be confused with LT2D School Admin.
 
 To simplify deployment we recomend using Caprover
