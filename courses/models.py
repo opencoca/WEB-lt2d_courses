@@ -105,6 +105,8 @@ class Snap(models.Model):
     description = models.CharField(max_length=500)
     page = models.ManyToManyField(Lession, blank=True)
     slug = models.SlugField(unique=True, blank=True)
+    #paginate_by = 3
+    #list_per_page = 10
     my_order = models.PositiveIntegerField(default=0, blank=False, null=False)
     file = models.FileField(upload_to='snap/%Y/%m/%d/', null=True, verbose_name="")
     http_only = models.BooleanField(default=False, blank=False, null=False)

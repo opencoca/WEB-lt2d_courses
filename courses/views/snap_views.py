@@ -11,7 +11,7 @@ from django.http import Http404
 class SnapListView(ListView):
     model = Snap
     template_name = "courses/snap_list.html"
-    paginate_by = 20
+    paginate_by = 10
     context_object_name = "snap_list"
     allow_empty = True
     page_kwarg = 'page'

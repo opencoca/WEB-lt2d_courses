@@ -77,6 +77,7 @@ class SnapAdmin(SortableAdminMixin, ExtendedModelAdminMixin, admin.ModelAdmin):
     prepopulated_fields = {}
     formfield_overrides = {}
     readonly_fields = []
+    list_per_page = 10
 
 admin.site.register(Syllabus, SyllabusAdmin)
 admin.site.register(Course, CourseAdmin)

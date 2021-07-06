@@ -1,1 +1,1 @@
-Apply the following if runing into baker problems https://github.com/krisfields/django-baker/pull/26
+Apply the following if running into baker problems https://github.com/krisfields/django-baker/pull/26
