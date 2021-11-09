@@ -9,11 +9,11 @@ verify_ssl = true
 ipython = "*"
 django-admin-sortable2 = "*"
 djangorestframework = "*"
-social-auth-app-django = "*"
-Django = ">=3.1.2"
+# social-auth-app-django = "*"
+Django = "*"
 django-cors-headers = "*"
 django-reverse-admin = "*"
-django-baker = "*"
+#django-baker = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
