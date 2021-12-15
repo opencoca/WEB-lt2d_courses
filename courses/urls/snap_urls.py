@@ -1,27 +1,27 @@
-from django.conf.urls import url
+from django.urls import path
 from ..views import (SnapListView, SnapCreateView, SnapDetailView,
                      SnapUpdateView, SnapDeleteView)
 from django.contrib.auth.decorators import login_required
 
 
 urlpatterns = [
-    url(r'^create/$',  # NOQA
+    path('create/',  # NOQA
         login_required(SnapCreateView.as_view()),
         name="snap_create"),
 
-    url(r'^(?P<slug>[-\w]+)/update/$',
+    path('<slug:slug>/update/',
         login_required(SnapUpdateView.as_view()),
         name="snap_update"),
 
-    url(r'^(?P<slug>[-\w]+)/delete/$',
+    path('<slug:slug>/delete/',
         login_required(SnapDeleteView.as_view()),
         name="snap_delete"),
 
-    url(r'^(?P<slug>[-\w]+)/$',
+    path('<slug:slug>',
         SnapDetailView.as_view(),
         name="snap_detail"),
 
-    url(r'^$',
+    path('',
         SnapListView.as_view(),
         name="snap_list"),
 ]

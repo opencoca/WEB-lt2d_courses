@@ -1,27 +1,27 @@
-from django.conf.urls import url
+from django.urls import path
 from ..views import (PageListView, PageCreateView, PageDetailView,
                      PageUpdateView, PageDeleteView)
 from django.contrib.auth.decorators import login_required
 
 
 urlpatterns = [
-    url(r'^create/$',  # NOQA
+    path('create/',  # NOQA
         login_required(PageCreateView.as_view()),
         name="page_create"),
 
-    url(r'^(?P<pk>\d+)/update/$',
+    path('<int:pk>/update/',
         login_required(PageUpdateView.as_view()),
         name="page_update"),
 
-    url(r'^(?P<pk>\d+)/delete/$',
+    path('<int:pk>/delete/',
         login_required(PageDeleteView.as_view()),
         name="page_delete"),
 
-    url(r'^(?P<pk>\d+)/$',
+    path('<int:pk>',
         PageDetailView.as_view(),
         name="page_detail"),
 
-    url(r'^$',
+    path('',
         PageListView.as_view(),
         name="page_list"),
 ]
