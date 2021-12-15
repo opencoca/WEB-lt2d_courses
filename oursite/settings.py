@@ -41,6 +41,7 @@ REST_FRAMEWORK = {
 INSTALLED_APPS = [
     'studio.apps.StudioConfig',
     'courses.apps.CoursesConfig',
+    'django_unused_media',
     'django_baker',
     'corsheaders',
     'adminsortable2',

@@ -1,27 +1,27 @@
-from django.conf.urls import url
+from django.urls import path
 from ..views import (LessionListView, LessionCreateView, LessionDetailView,
                      LessionUpdateView, LessionDeleteView)
 from django.contrib.auth.decorators import login_required
 
 
 urlpatterns = [
-    url(r'^create/$',  # NOQA
+    path('^create/',  # NOQA
         login_required(LessionCreateView.as_view()),
         name="lession_create"),
 
-    url(r'^(?P<pk>\d+)/update/$',
+    path('<int:pk>/update/',
         login_required(LessionUpdateView.as_view()),
         name="lession_update"),
 
-    url(r'^(?P<pk>\d+)/delete/$',
+    path('<int:pk>/delete/',
         login_required(LessionDeleteView.as_view()),
         name="lession_delete"),
 
-    url(r'^(?P<pk>\d+)/$',
+    path('<int:pk>/',
         LessionDetailView.as_view(),
         name="lession_detail"),
 
-    url(r'^$',
+    path('',
         LessionListView.as_view(),
         name="lession_list"),
 ]

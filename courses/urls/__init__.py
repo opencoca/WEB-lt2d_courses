@@ -1,12 +1,13 @@
-from django.conf.urls import include, url
+from django.urls import path
+from django.conf.urls import include
 
 app_name="courses"
 
 urlpatterns = [
 
-    url(r'^syllabus/', include('courses.urls.syllabus_urls')),  # NOQA
-    url(r'^courses/', include('courses.urls.course_urls')),
-    url(r'^lessions/', include('courses.urls.lession_urls')),
-    url(r'^pages/', include('courses.urls.page_urls')),
-    url(r'^snaps/', include('courses.urls.snap_urls')),
+    path('syllabus/', include('courses.urls.syllabus_urls')),  # NOQA
+    path('courses/', include('courses.urls.course_urls')),
+    path('lessions/', include('courses.urls.lession_urls')),
+    path('pages/', include('courses.urls.page_urls')),
+    path('snaps/', include('courses.urls.snap_urls')),
 ]
