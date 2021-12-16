@@ -1,0 +1,31 @@
+{
+  "name": "{{ snap }}",
+  "short_name": "{{ snap.slug }}",
+  "icons": [{
+      "src": "/static/imgs/snap-icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },{
+      "src": "/static/imgs/snap-icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }, {
+      "src": "/static/imgs/snap-icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }, {
+      "src": "/static/imgs/snap-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }, {
+      "src": "/static/imgs/snap-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }],
+  "lang": "en-US",
+  "start_url": "{% url "courses:snap_detail" snap.slug %}",
+  "display": "standalone",
+  "background_color": "white",
+  "theme_color": "white"
+}

@@ -1,4 +1,5 @@
 {% extends "courses/snap_base.html" %}
+{% block head_content %}<link rel="manifest" href="manifest.json">{% endblock %}
 
 {% block title %}
 {{ snap }}
@@ -17,6 +18,12 @@
   background-size: contain">
   <script>
     setTimeout(function() { document.getElementById("snap-container").style.backgroundImage = "none"}, 5000);
+
+    window.onload = function () {
+      if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('{% url "courses:snap_detail" snap.slug %}sw.js');
+      }
+    }
   </script>
   <iframe src="/static/snap/Snap/snap-no-logging.html" scrolling="no" class="iframe-clipped" id="snapFrame" project_path="/media/{{ snap.file }}"
     show_palette="True" {% comment %} block_size="2" {% endcomment %}
