@@ -99,6 +99,7 @@ class SnapManifestView(SnapDetailView):
 
 class SnapSWView(SnapDetailView):
     template_name = "courses/snap_sw.js"
+    content_type='text/javascript'
 
 class SnapCreateView(CreateView):
     model = Snap
