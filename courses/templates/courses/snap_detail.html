@@ -1,5 +1,12 @@
 {% extends "courses/snap_base.html" %}
-{% block head_content %}<link rel="manifest" href="manifest.json">{% endblock %}
+{% block head_content %}<link rel="manifest" href="manifest.json">
+    <style>      @media screen and (display-mode: standalone) {
+      #snap-container{
+        position: absolute;
+        top: 0;
+        height: 100vh;
+      }
+    }</style>{% endblock %}
 
 {% block title %}
 {{ snap }}
