@@ -1,6 +1,12 @@
 {
   "name": "{{ snap }}",
   "short_name": "{{ snap.slug }}",
+  "start_url": "{% url "courses:snap_detail" snap.slug %}",
+  "background_color": "white",
+  "theme_color": "white",
+  "lang": "en-US",
+  "display": "standalone",
+  "orientation": "landscape",
   "icons": [{
       "src": "/static/imgs/snap-icon-72.png",
       "sizes": "72x72",
@@ -21,10 +27,5 @@
       "src": "/static/imgs/snap-icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    }],
-  "lang": "en-US",
-  "start_url": "{% url "courses:snap_detail" snap.slug %}",
-  "display": "standalone",
-  "background_color": "white",
-  "theme_color": "white"
+    }]
 }
