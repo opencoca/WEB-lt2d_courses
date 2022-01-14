@@ -3629,11 +3629,6 @@ Morph.prototype.fullImage = function () {
     var fb = this.fullBounds(),
         img = newCanvas(fb.extent()),
         ctx = img.getContext('2d');
-    
-    ctx.imageSmoothingEnabled = false;
-    ctx.mozImageSmoothingEnabled = false;
-    ctx.webkitImageSmoothingEnabled = false;
-    ctx.msImageSmoothingEnabled = false;
     ctx.translate(-fb.origin.x, -fb.origin.y);
     this.fullDrawOn(ctx, fb);
     return img;

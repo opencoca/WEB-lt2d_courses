@@ -42,7 +42,7 @@
       <!--<script src='https://cdn.statically.io/gh/WebReflection/circular-json/af2987de/build/circular-json.js'></script>-->
 
     <script>
-      let world;
+      var world;
       window.onload = function () {
           if ('serviceWorker' in navigator) {
               navigator.serviceWorker.register('sw.js');
@@ -62,27 +62,25 @@
       /*
       //for ios to lock the screen in landscape
       @media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {
-        html {
-        transform: rotate(-90deg);
-        transform-origin: left top;
-        width: 100vh;
-        height: 100vw;
-        overflow-x: hidden;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        }
+      html {
+      transform: rotate(-90deg);
+      transform-origin: left top;
+      width: 100vh;
+      height: 100vw;
+      overflow-x: hidden;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      }
+      }
+      @media screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
+      html {
+      }
       }*/
     </style>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
     <link rel="stylesheet" type="text/css" href="modal.css">
-    <style>
-      body {padding: unset}
-      canvas{    
-        image-rendering: -moz-crisp-edges;
-        image-rendering: -webkit-crisp-edges;
-        image-rendering: pixelated;}
-    </style>
+    <style>body {padding: unset}</style>
   </head>
   <body style="margin: 0;">
     <div id="MobileModal" class="modal">
