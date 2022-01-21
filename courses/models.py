@@ -68,9 +68,9 @@ class Course(models.Model):
     def recent_course(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=180)
 
-class Lession(models.Model):
+class Lesson(models.Model):
     """
-    This represents a Lession, or chapter
+    This represents a Lesson, or chapter
     """
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=200)
@@ -80,7 +80,7 @@ class Lession(models.Model):
 
     class Meta(object):
         ordering = ['order']
-        #verbose_name_plural = "2. Lessions"
+        #verbose_name_plural = "2. Lessons"
 
     def __str__(self):
         return self.title
@@ -88,7 +88,7 @@ class Lession(models.Model):
 class Page(models.Model):
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=200)
-    lession = models.ManyToManyField(Lession, blank=True)
+    lesson = models.ManyToManyField(Lesson, blank=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta(object):
@@ -104,7 +104,7 @@ class Snap(models.Model):
     title = models.CharField(max_length=200)
     subtile = models.CharField(max_length=200)
     description = models.CharField(max_length=500)
-    page = models.ManyToManyField(Lession, blank=True)
+    page = models.ManyToManyField(Lesson, blank=True)
     slug = models.SlugField(unique=True, blank=True)
     my_order = models.PositiveIntegerField(default=0, blank=False, null=False)
     file = models.FileField(upload_to='snap/%Y/%m/%d/', null=True, verbose_name="")

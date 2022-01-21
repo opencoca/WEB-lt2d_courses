@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Lession',
+            name='Lesson',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200)),
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=500)),
                 ('slug', models.SlugField(blank=True, unique=True)),
                 ('file', models.FileField(null=True, upload_to='snap/%Y/%m/%d/', verbose_name='')),
-                ('page', models.ManyToManyField(blank=True, to='courses.Lession')),
+                ('page', models.ManyToManyField(blank=True, to='courses.Lesson')),
             ],
             options={
                 'ordering': ['slug'],
@@ -70,14 +70,14 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=200)),
                 ('subtitle', models.CharField(max_length=200)),
                 ('order', models.PositiveIntegerField(default=0)),
-                ('lession', models.ManyToManyField(blank=True, to='courses.Lession')),
+                ('lesson', models.ManyToManyField(blank=True, to='courses.Lesson')),
             ],
             options={
                 'ordering': ['order'],
             },
         ),
         migrations.AddField(
-            model_name='lession',
+            model_name='lesson',
             name='course',
             field=models.ManyToManyField(blank=True, to='courses.Course'),
         ),

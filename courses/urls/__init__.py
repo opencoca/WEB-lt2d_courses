@@ -7,7 +7,7 @@ urlpatterns = [
 
     path('syllabus/', include('courses.urls.syllabus_urls')),  # NOQA
     path('courses/', include('courses.urls.course_urls')),
-    path('lessions/', include('courses.urls.lession_urls')),
+    path('lessons/', include('courses.urls.lesson_urls')),
     path('pages/', include('courses.urls.page_urls')),
     path('snaps/', include('courses.urls.snap_urls')),
 ]

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Syllabus, Course, Lession, Page, Snap
+from .models import Syllabus, Course, Lesson, Page, Snap
 
 
 class SyllabusForm(forms.ModelForm):
@@ -88,10 +88,10 @@ class CourseForm(forms.ModelForm):
         return super(CourseForm, self).save(commit)
 
 
-class LessionForm(forms.ModelForm):
+class LessonForm(forms.ModelForm):
 
     class Meta:
-        model = Lession
+        model = Lesson
         fields = ['title', 'subtitle','url', 'order']
         exclude = []
         widgets = None
@@ -101,13 +101,13 @@ class LessionForm(forms.ModelForm):
         error_messages = {}
 
     def __init__(self, *args, **kwargs):
-        return super(LessionForm, self).__init__(*args, **kwargs)
+        return super(LessonForm, self).__init__(*args, **kwargs)
 
     def is_valid(self):
-        return super(LessionForm, self).is_valid()
+        return super(LessonForm, self).is_valid()
 
     def full_clean(self):
-        return super(LessionForm, self).full_clean()
+        return super(LessonForm, self).full_clean()
 
     def clean_title(self):
         title = self.cleaned_data.get("title", None)
@@ -122,13 +122,13 @@ class LessionForm(forms.ModelForm):
         return order
 
     def clean(self):
-        return super(LessionForm, self).clean()
+        return super(LessonForm, self).clean()
 
     def validate_unique(self):
-        return super(LessionForm, self).validate_unique()
+        return super(LessonForm, self).validate_unique()
 
     def save(self, commit=True):
-        return super(LessionForm, self).save(commit)
+        return super(LessonForm, self).save(commit)
 
 
 class PageForm(forms.ModelForm):
