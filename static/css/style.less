@@ -3,8 +3,6 @@ section, .section {
   max-width: 72em;
 }
 
-
-
 .navbar .column{
   border: none;
   background: inherit;
@@ -237,6 +235,12 @@ strong {
   justify-content: center;
 }
 
+ul.pagination{
+  list-style: none;
+  display: flex;
+  li{ margin: 0 10;}
+}
+
 h1,.title {
   color: #222324;
   font-size: 28px;
@@ -346,6 +350,17 @@ h3,.highlight {
   & .nt {
     color: #268bd2;
   }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
 }
 
 @media screen and (max-width: 768px) {
