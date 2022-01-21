@@ -92,7 +92,7 @@ class LessionForm(forms.ModelForm):
 
     class Meta:
         model = Lession
-        fields = ['title', 'subtitle', 'order']
+        fields = ['title', 'subtitle','url', 'order']
         exclude = []
         widgets = None
         localized_fields = None

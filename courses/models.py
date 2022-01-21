@@ -74,6 +74,7 @@ class Lession(models.Model):
     """
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=200)
+    url = models.URLField(max_length=200, blank=True, null=True)
     course = models.ManyToManyField(Course, blank=True)
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
