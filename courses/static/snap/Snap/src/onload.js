@@ -97,16 +97,17 @@ function load_project_path_if_exists() {
 		};
 
 
-	project_path = window.frameElement.getAttribute("project_path");
-
-	if (project_path) {
-		// fetch and load
-		ide_morph.showMessage("Loading...", 10);
-		fetch(project_path).then(function (response) {
-			ide_morph.showMessage("Opening project");
-			response.text().then(load_project_string);
-		}).catch(function (error) {
-			ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
-		});
+	if (hasProjectPath()) {
+		project_path = window.frameElement.getAttribute("project_path");
+		if (project_path) {
+			// fetch and load
+			ide_morph.showMessage("Loading...", 10);
+			fetch(project_path).then(function (response) {
+				ide_morph.showMessage("Opening project");
+				response.text().then(load_project_string);
+			}).catch(function (error) {
+				ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
+			});
+		}
 	}
 }

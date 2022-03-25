@@ -143,7 +143,7 @@
         ide.setBlocksScale(1.2);
         ide.setPaletteWidth(235);
         // Only load library from github if NOT hosted
-        if (!window.frameElement.getAttribute("project_path")) {
+        if (!hasProjectPath()) {
           // Load in library from github
           fetch("https://raw.githubusercontent.com/Robot-In-A-Can/eBrain-Snap/develop/RIAC%20Blocks.xml")
           .then(response => {
@@ -202,11 +202,23 @@
       }
 
       function autosavePath() {
-        var projectPath = window.frameElement.getAttribute("project_path");
-        if (projectPath) {
+        if (hasProjectPath()) {
+          var projectPath = window.frameElement.getAttribute("project_path");
           return "snapIDE" + projectPath;
         } else {
           return "snapIDE" + window.location.href;
+        }
+      }
+
+      function hasProjectPath() {
+        try {
+         if (window.frameElement && window.frameElement.getAttribute("project_path")) {
+           return true;
+         } else {
+           return false;
+         }
+        } catch (e) {
+          return false;
         }
       }
       /**
