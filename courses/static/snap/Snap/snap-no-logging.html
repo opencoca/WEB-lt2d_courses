@@ -229,26 +229,19 @@
        */
       function askYesNo(title, message, callback) {
         let box = new DialogBoxMorph();
-        // add label
-        box.labelString = title;
-        box.createLabel();
-        // add body
-        var txt = new TextMorph(message);
-        txt.isBold = false;
-        box['addBody'](txt); // Text should be bold to match the snap style but has to be false here, otherwise the text overflows.
-        // Add methods for buttons to call
-        box.yes = function() {
-          box.ok(); // close the box
+        // The function askYesNo below creates buttons that
+        // call these functions, ok and cancel.
+        box.ok = function() {
           callback(true);
-        };
-        box.no = function() {
-          box.ok(); // close the box
+          box.accept();
+        }
+        box.cancel = function() {
           callback(false);
-        };
-        box.addButton('yes', 'Yes'); // This button triggers the 'yes' function
-        box.addButton('no', 'No'); // This button triggers the 'no' function
-        box.fixLayout(); // required
-        setTimeout(function() {box.popUp(world)}, 400);
+          box.destroy();
+        }
+        setTimeout(function() {
+          box.askYesNo(title, message, world);
+        }, 400);
       }
       
       function addToDemo() {
