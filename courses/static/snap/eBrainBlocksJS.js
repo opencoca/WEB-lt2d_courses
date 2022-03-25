@@ -15,11 +15,11 @@ function filterUnicode(quoted){
 
 /**
  * ParentEveBrain has the movement functions (move, turn,
- * forward, etc) and digitalInput. These functions then
+ * forward, etc) and digitalInput. These functions then 
  * call the send function, which subclasses need to define.
  * Methods required to implement: send_msg.
- *
- * NOTE: the API for callbacks here is: state (usually started
+ * 
+ * NOTE: the API for callbacks here is: state (usually started 
  * or complete), message (the returned message from the robot), optional.
  * Optional is not passed usually, so it is undefined (except when stop() is used).
  */
@@ -43,7 +43,7 @@ ParentEveBrain.prototype = {
    * Deals with the callback, and queues up the message to be sent to ebrain.
    * If the command is not 'important' (ie not 'stop', etc) it is queued up.
    * The subclasses must call process_msg_queue when the robot is idle to
-   * make sure queued messages are indeed sent, and must shift() the queue once
+   * make sure queued messages are indeed sent, and must shift() the queue once 
    * a response is received.
    * @param msg Message to send
    * @param cb callback for message
@@ -106,11 +106,11 @@ ParentEveBrain.prototype = {
     this.send({cmd: 'setConfig', arg: {sta_ssid: SSID, sta_pass: PASS}}, callback);
   },
 
-  postToServer: function (onOff, server_host, sec, callback) {
+  postToServer: function (onOff, server_host, sec, temp, dist, callback) {
     onOff = onOff === 'On' ? 1 : 0;
     this.send({
       cmd: "postToServer",
-      arg: { "onOff": onOff, "server": server_host, "time": sec }
+      arg: { "onOff": onOff, "server": server_host, "time": sec, "toggleTempHumidity":temp,"toggleDistance":dist }
     }, callback);
   },
 
@@ -122,6 +122,18 @@ ParentEveBrain.prototype = {
         self.digitalSensor[pin_number] = msg.msg;
       }
     });
+  },
+
+  digitalNotify: function(pin_number, cb) {
+    var self = this;
+    this.send({cmd: 'digitalNotify', arg:pin_number}, cb);
+  },
+
+  digitalStopNotify: function(pin_number, cb) {
+    // Remove the pin status from sensorState
+    var index = 'pin_' + pin_number + '_status';
+    delete this.sensorState[index];
+    this.send({cmd: 'digitalStopNotify', arg:pin_number}, cb);
   },
 
   analogInput: function(pin_number, cb){
@@ -232,6 +244,7 @@ ParentEveBrain.prototype = {
     this.move('rightMotorF', distance, cb);
   },
 
+  
   leftMotorBackward: function(distance, cb){
     this.move('leftMotorB', distance, cb);
   },
@@ -264,7 +277,7 @@ EveBrain.prototype = {
   connect: function(){
     if(!this.connected && !this.error){
       var self = this;
-      try {
+      try { 
         //clear any previous websockets and clear msg queue and all timers
         clearTimeout(self.timeoutTimer);
         clearTimeout(self.connTimeout);
@@ -291,13 +304,13 @@ EveBrain.prototype = {
       if (attempts < 10) {
         this.connTimeout = window.setTimeout(function(){
           if(!self.connected){
-            try {
+            try { 
               self.ws.close();;
             }
             catch(error) {
               console.log(error);
             }
-          }
+          } 
         }, 1000);
       }
     }
@@ -344,6 +357,12 @@ EveBrain.prototype = {
           self.reconnectTimer = undefined;
           self.connect();
         }, 1000);
+        // If at the end of the attempts, show the user an alert and pause their code.
+      } else if (attempts >= 10) {
+        morphicAlert("Robot Disconnected!",
+          "Robot disconnected by WiFi!\nPlease reconnect using the Connect block and unpause.");
+        world.moveon = 1;
+        world.children[0].stage.threads.pauseAll();
       }
     }
   },
@@ -455,6 +474,10 @@ EveBrain.prototype = {
           delete this.cbs[msg.id];
         }
       }
+      
+      if (msg.status === 'error') {
+        morphicAlert("Error", msg['msg']); // Alert user about error
+      }
       if(msg.status && msg.status === 'error' && msg.msg === 'Too many connections'){
         this.error = true;
         this.broadcast('error');
@@ -479,7 +502,12 @@ for (parentMemberName in ParentEveBrain.prototype) {
 var EveBrainUSB = function() {
   ParentEveBrain.call(this);
   this.cbs = {};
-  this.connected = false;
+  // Initially, set connected to true if there is a port.
+  if (world.port) {
+    this.connected = true;
+  } else {
+    this.connected = false;
+  }
 };
 
 EveBrainUSB.prototype = Object.create(ParentEveBrain.prototype);
@@ -520,6 +548,9 @@ EveBrainUSB.prototype.doCallback = function(message) {
       delete this.cbs[message.id];
     }
     return;
+  } else if (message && message.status === 'error') {
+    morphicAlert("Error", message.msg);
+    // this.msg_stack.shift(); // Pop message that prompted this response off queue
   }
 }
 
@@ -545,8 +576,22 @@ world.outputStream = undefined; // Set this to undefined so it is easy to check 
 async function USBconnect() {
   // Request & open port here.
   world.port = await navigator.serial.requestPort();
+  if (ebUSB) {
+    ebUSB.connected = true;
+  }
   // Wait for the port to open.
   await world.port.open({ baudRate: 230400 });
+
+  // on disconnect, alert user and pause Snap!
+  world.port.addEventListener('disconnect', event => {
+    if (ebUSB) {
+      ebUSB.connected = false; // signal disconnection to other code.
+    }
+    morphicAlert("Robot Disconnected!", 
+    "Robot disconnected by USB!\nPlease reconnect using the Connect block and unpause.");
+    world.moveon = 1;
+    world.children[0].stage.threads.pauseAll();
+  });
 
   // Setup the output stream
   const encoder = new TextEncoderStream();
@@ -563,7 +608,7 @@ async function USBconnect() {
 }
 
 /**
- * This reads from the serial in a loop, and
+ * This reads from the serial in a loop, and 
  * runs the given callbacks (using ebUSB).
  */
 async function readLoop() {
@@ -603,7 +648,7 @@ async function readLoop() {
 /**
  * Tries to parse string as json. Also verifies that it is valid (check it has an id).
  * NOTE: the json MUST end with '\r\n'
- * @return An object of form {parsed, unparseable}, where parseable is a
+ * @return An object of form {parsed, unparseable}, where parseable is a 
  * list of all parseable objects and, unparseable is a string representing what remaining
  * bits couldn't be parsed (if such exists).
 */
@@ -636,4 +681,72 @@ function writeToStream(...lines) {
     writer.write(line + '\n');
   });
   writer.releaseLock();
+}
+
+// https://forum.snap.berkeley.edu/t/how-do-i-make-a-dialog-box-with-custom-buttons/6347/4
+/**
+ * Creates a morhpic dialog and shows it to the user, with one 'Close' button.
+ * If there is another alert with the same title and message, this one will not be shown.
+ * NOTE: this uses non bold text, otherwise the text is clipped.
+ * @param {string} title Title for the dialog
+ * @param {String} message Rest parameters of lines to show in the body of the dialog.
+ * If it does not contain Strings, calls toString on it.
+ */
+function morphicAlert(title, ...messages) {
+  if (Array.isArray(messages) && messages.length > 0) {
+    var message = "";
+    for (var i = 0; i < messages.length - 1; i++) {
+      message += messages[i] + "\n";
+    }
+    message += messages[messages.length - 1];
+    morphicAlertString(title, message);
+  } else if (typeof messages === "string") {
+    morphicAlertString(title, messages);
+  } else if (messages === null || messages === undefined) {
+    morphicAlertString(title, "[Error message is missing. Please report that this happened to the developers.]");
+  } else {
+    morphicAlertString(title, messages.toString());
+  }
+}
+
+var activeAlerts = new Map();
+
+/**
+ * Creates a morhpic dialog and shows it to the user, with one 'Close' button.
+ * NOTE: use morphicAlert instead, it has more robust type checking.
+ * @param {string} title Title for the dialog
+ * @param {string} message Message in the body of the dialog
+ */
+ function morphicAlertString(title, message) {
+  var alertContents = title + message;
+  if (activeAlerts.get(alertContents) !== undefined) {
+    // don't create a dialog if an identical one exists.
+    return;
+  }
+
+  let box = new DialogBoxMorph(); // make dialog
+  // add label (in the weirdest way imaginable)
+  box.labelString = title;
+  box.createLabel();
+  const addLabel = function (text, type) {
+    let txt = new TextMorph(text);
+    // Text should be bold to match the snap style but has to be 
+    // false here, otherwise the text overflows.
+    txt.isBold = false;
+    box['add' + type](txt);
+  }
+  addLabel(message, 'Body') // do not change the second input of these
+  box.titleBarColor = new Color(255, 0, 0, 1); // Make titlebar red
+  box.titlePadding = 12; // make titlebar taller
+
+  // Add this box to the activeAlerts map, and make the close button work.
+  activeAlerts.set(alertContents, box);
+  box.cancelAndProcess = function() {
+    box.ok();
+    activeAlerts.delete(alertContents);
+  }
+  // This button will close the dialog and remove it from the list of active alerts
+  box.addButton('cancelAndProcess', 'Close');
+  box.fixLayout(); // required, otherwise box looks weird
+  box.popUp(world); // popup box
 }

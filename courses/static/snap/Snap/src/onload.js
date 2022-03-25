@@ -5,9 +5,10 @@
  */
 
 let world;
+let ide_morph;
 window.addEventListener('load', function () {
 	var world_canvas = document.getElementById('world');
-	var ide_morph = new IDE_Morph();
+	ide_morph = new IDE_Morph();
 	var loop = function loop() {
 		requestAnimationFrame(loop);
 		world.doOneCycle();
@@ -17,45 +18,6 @@ window.addEventListener('load', function () {
 	let run_full_screen = window.location.href.indexOf('noRun') < 0;
 	let project_path;
 	let show_palette = true; // unless in an iframe where the default is to hide it for space reasons
-	const load_project_string = 
-		function (project_text) {
-			// timeout wasn't needed before Snap 4.1
-			// without it iframes show only Snap! background texture
-			if (!project_text || project_text.indexOf('Status 404 – Not Found') >= 0) {
-				ide_morph.showMessage("Error fetching " + project_path);
-				return;
-			}
-			setTimeout(function () {
-				           const parameters = new URLSearchParams(window.parent.location.hash);
-				           if (parameters.get('locale')) {
-				           	   // Snap uses _ instead of - in two part language code names
-				           	   ide_morph.setLanguage(parameters.get('locale').replace('-', '_'));
-				           }
-				           ide_morph.rawOpenProjectString(project_text);
-						   if (window.location.href.indexOf('editMode') >= 0) {
-							   ide_morph.toggleAppMode(false);
-						   } else if (full_screen) {
-						   	   ide_morph.toggleAppMode(true);
-						   	   if (run_full_screen) {
-								   ide_morph.runScripts();
-							   }
-						   }
-						   ide_morph.showMessage(""); // remove message
-// 						   if (!show_palette && full_screen && edit_mode) {
-//                                ide_morph.setPaletteWidth(0);
-//                            }
-					   },
-					   1000);
-	};
-    const fetch_and_load = function (project_path) {
-    	ide_morph.showMessage("Loading...", 10);
-    	fetch(project_path).then(function (response) {
-    		                         ide_morph.showMessage("Opening project");
-									 response.text().then(load_project_string);
-								 }).catch(function (error) {
-									 ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
-								 });
-    };
 	world = new WorldMorph(world_canvas);
 //  world.worldCanvas.focus(); // not good for pages with iframes containing Snap! programs
 	ide_morph.openIn(world);
@@ -68,15 +30,13 @@ window.addEventListener('load', function () {
 	    	}
 	    	return;
 	    }
-		project_path = window.frameElement.getAttribute("project_path");
+		
 		run_full_screen = run_full_screen || window.frameElement.getAttribute("run_full_screen");
 		full_screen = run_full_screen || full_screen || window.frameElement.getAttribute("full_screen");
 		edit_mode = edit_mode || window.frameElement.getAttribute("edit_mode");
 		show_palette = window.frameElement.getAttribute("show_palette");
 		let stage_scale = window.frameElement.getAttribute("stage_ratio");
-		if (project_path) {
-			fetch_and_load(project_path);
-		}
+		
 		if (!full_screen && edit_mode) {
 			ide_morph.controlBar.hide();    // no need for the control bar
 			ide_morph.toggleAppMode(false); // launch in edit mode
@@ -104,3 +64,49 @@ window.addEventListener('load', function () {
 // 	window.addEventListener('load', loop);
 });
 
+function load_project_path_if_exists() {
+	const load_project_string =
+		function (project_text) {
+			// timeout wasn't needed before Snap 4.1
+			// without it iframes show only Snap! background texture
+			if (!project_text || project_text.indexOf('Status 404 – Not Found') >= 0) {
+				ide_morph.showMessage("Error fetching " + project_path);
+				return;
+			}
+			setTimeout(function () {
+				const parameters = new URLSearchParams(window.parent.location.hash);
+				if (parameters.get('locale')) {
+					// Snap uses _ instead of - in two part language code names
+					ide_morph.setLanguage(parameters.get('locale').replace('-', '_'));
+				}
+				ide_morph.rawOpenProjectString(project_text);
+				if (window.location.href.indexOf('editMode') >= 0) {
+					ide_morph.toggleAppMode(false);
+				} else if (full_screen) {
+					ide_morph.toggleAppMode(true);
+					if (run_full_screen) {
+						ide_morph.runScripts();
+					}
+				}
+				ide_morph.showMessage(""); // remove message
+// 				if (!show_palette && full_screen && edit_mode) {
+//                 ide_morph.setPaletteWidth(0);
+//              }
+			},
+				1000);
+		};
+
+
+	project_path = window.frameElement.getAttribute("project_path");
+
+	if (project_path) {
+		// fetch and load
+		ide_morph.showMessage("Loading...", 10);
+		fetch(project_path).then(function (response) {
+			ide_morph.showMessage("Opening project");
+			response.text().then(load_project_string);
+		}).catch(function (error) {
+			ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
+		});
+	}
+}
