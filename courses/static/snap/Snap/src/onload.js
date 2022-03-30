@@ -60,6 +60,7 @@ window.addEventListener('load', function () {
 			fetch_and_load(project_path);
 		}
 	}
+	loadProjectOrSample();
 	loop();
 // 	window.addEventListener('load', loop);
 });

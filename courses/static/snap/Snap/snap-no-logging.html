@@ -142,6 +142,12 @@
         ide.flatDesign();
         ide.setBlocksScale(1.2);
         ide.setPaletteWidth(235);
+
+        addToDemo();
+      }
+
+      function loadProjectOrSample() {
+        var ide = world.children[0];
         // Only load library from github if NOT hosted
         if (!hasProjectPath()) {
           // Load in library from github
@@ -165,9 +171,6 @@
         } else {
           loadProject();
         }
-        
-
-        addToDemo();
       }
 
       function loadProject() {
