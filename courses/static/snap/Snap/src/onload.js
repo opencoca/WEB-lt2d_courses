@@ -21,7 +21,7 @@ window.addEventListener('load', function () {
 	world = new WorldMorph(world_canvas);
 //  world.worldCanvas.focus(); // not good for pages with iframes containing Snap! programs
 	ide_morph.openIn(world);
-	if (window !== window.parent) { // if running in an iframe see if a local project_path is declared
+	if (window !== window.parent) { // if running in an iframe setup snap for that
 	    if (!window.frameElement) {
 	    	if (window.location.protocol !== 'https:' && window.location.protocol !== 'http:') {
 	    		alert("Cannot load project into Snap! since URL protocol is neither HTTPS nor HTTP.");
@@ -47,20 +47,8 @@ window.addEventListener('load', function () {
 		ide_morph.setBlocksScale(1); // the chapter projects were designed with default block size (though scaled via CSS)
 		window.onbeforeunload = function () {}; // don't bother the user about reloading
 		window.speechSynthesis.getVoices();     // no need to wait for them to load
-	} else if (window.location.search) {
-		const parameters = new URLSearchParams(window.location.search);
-		if (parameters.has('project')) {
-			let project_name = parameters.get('project');
-			project_path = project_name;
-			if (project_name.indexOf('/') < 0) {
-				// if just a name use the default folder and extension
-				project_path = "/ai/projects/" + project_path  + ".xml";
-			}
-			edit_mode = parameters.has('editMode');
-			fetch_and_load(project_path);
-		}
 	}
-	loadProjectOrSample();
+	loadAutosaveOrSample();
 	loop();
 // 	window.addEventListener('load', loop);
 });
@@ -100,15 +88,89 @@ function load_project_path_if_exists() {
 
 	if (hasProjectPath()) {
 		project_path = window.frameElement.getAttribute("project_path");
-		if (project_path) {
-			// fetch and load
-			ide_morph.showMessage("Loading...", 10);
-			fetch(project_path).then(function (response) {
-				ide_morph.showMessage("Opening project");
-				response.text().then(load_project_string);
-			}).catch(function (error) {
-				ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
+		// fetch and load
+		ide_morph.showMessage("Loading...", 10);
+		fetch(project_path).then(function (response) {
+			ide_morph.showMessage("Opening project");
+			response.text().then(load_project_string);
+		}).catch(function (error) {
+			ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
+		});
+	}
+}
+
+
+function loadAutosaveOrSample() {
+	var ide = world.children[0];
+	// Only load library from github if NOT hosted
+	if (!hasProjectPath()) {
+		// Load in library from github
+		fetch("https://raw.githubusercontent.com/Robot-In-A-Can/eBrain-Snap/develop/RIAC%20Blocks.xml")
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('could not fetch RIAC blocks from github');
+				}
+				return response.text();
+			}).then(RIAClibrary => {
+				ide.droppedText(RIAClibrary, "RIAC");
+				localStorage.setItem("RIAClibrary", RIAClibrary);
+			}).catch(error => {
+				console.log('cannot load library from internet. Attempting load from cache');
+				if (localStorage.getItem("RIAClibrary") !== undefined) {
+					ide.droppedText(localStorage.getItem("RIAClibrary"), "RIAC");
+				} else {
+					alert("Cannot load RIAC library");
+				}
+			}).then(loadAutosave);
+	} else {
+		loadAutosave();
+	}
+}
+
+function loadAutosave() {
+	var ide = world.children[0];
+	var storedProject = localStorage.getItem("snapIDE" + autosavePath());
+	if (storedProject) {
+		askYesNo("Load project?", "Do you want to load the project you were working on?",
+			function (button) {
+				// Must delay autosave until after a selection is made, otherwise empty project will be auto saved.
+				if (button) {
+					ide.openProjectString(storedProject, startAutosave);
+				} else {
+					load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+					startAutosave();
+				}
 			});
-		}
+	} else {
+		load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+		startAutosave();
+	}
+}
+
+/**
+ * Start project autosave every 15 seconds.
+ */
+function startAutosave() {
+	var saveInterval = setInterval(function () {
+		var ide = world.children[0];
+		var xml = ide.serializer.serialize(new Project(ide.scenes, ide.scene));
+		localStorage.setItem("snapIDE" + autosavePath(), xml);
+	}, 15000);
+}
+
+function autosavePath() {
+	if (hasProjectPath()) {
+		var projectPath = window.frameElement.getAttribute("project_path");
+		return "snapIDE" + projectPath;
+	} else {
+		return "snapIDE" + window.location.href;
+	}
+}
+
+function hasProjectPath() {
+	try {
+		return window.frameElement && window.frameElement.getAttribute("project_path");
+	} catch (e) {
+		return false;
 	}
 }
