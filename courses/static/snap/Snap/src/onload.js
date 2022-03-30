@@ -51,7 +51,8 @@ window.addEventListener('load', function () {
 	loadAutosaveOrSample();
 	loop();
 // 	window.addEventListener('load', loop);
-});
+
+
 
 function load_project_path_if_exists() {
 	const load_project_string =
@@ -100,77 +101,78 @@ function load_project_path_if_exists() {
 }
 
 
-function loadAutosaveOrSample() {
-	var ide = world.children[0];
-	// Only load library from github if NOT hosted
-	if (!hasProjectPath()) {
-		// Load in library from github
-		fetch("https://raw.githubusercontent.com/Robot-In-A-Can/eBrain-Snap/develop/RIAC%20Blocks.xml")
-			.then(response => {
-				if (!response.ok) {
-					throw new Error('could not fetch RIAC blocks from github');
-				}
-				return response.text();
-			}).then(RIAClibrary => {
-				ide.droppedText(RIAClibrary, "RIAC");
-				localStorage.setItem("RIAClibrary", RIAClibrary);
-			}).catch(error => {
-				console.log('cannot load library from internet. Attempting load from cache');
-				if (localStorage.getItem("RIAClibrary") !== undefined) {
-					ide.droppedText(localStorage.getItem("RIAClibrary"), "RIAC");
-				} else {
-					alert("Cannot load RIAC library");
-				}
-			}).then(loadAutosave);
-	} else {
-		loadAutosave();
-	}
-}
-
-function loadAutosave() {
-	var ide = world.children[0];
-	var storedProject = localStorage.getItem("snapIDE" + autosavePath());
-	if (storedProject) {
-		askYesNo("Load project?", "Do you want to load the project you were working on?",
-			function (button) {
-				// Must delay autosave until after a selection is made, otherwise empty project will be auto saved.
-				if (button) {
-					ide.openProjectString(storedProject, startAutosave);
-				} else {
-					load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
-					startAutosave();
-				}
-			});
-	} else {
-		load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
-		startAutosave();
-	}
-}
-
-/**
- * Start project autosave every 15 seconds.
- */
-function startAutosave() {
-	var saveInterval = setInterval(function () {
+	function loadAutosaveOrSample() {
 		var ide = world.children[0];
-		var xml = ide.serializer.serialize(new Project(ide.scenes, ide.scene));
-		localStorage.setItem("snapIDE" + autosavePath(), xml);
-	}, 15000);
-}
-
-function autosavePath() {
-	if (hasProjectPath()) {
-		var projectPath = window.frameElement.getAttribute("project_path");
-		return "snapIDE" + projectPath;
-	} else {
-		return "snapIDE" + window.location.href;
+		// Only load library from github if NOT hosted
+		if (!hasProjectPath()) {
+			// Load in library from github
+			fetch("https://raw.githubusercontent.com/Robot-In-A-Can/eBrain-Snap/develop/RIAC%20Blocks.xml")
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('could not fetch RIAC blocks from github');
+					}
+					return response.text();
+				}).then(RIAClibrary => {
+					ide.droppedText(RIAClibrary, "RIAC");
+					localStorage.setItem("RIAClibrary", RIAClibrary);
+				}).catch(error => {
+					console.log('cannot load library from internet. Attempting load from cache');
+					if (localStorage.getItem("RIAClibrary") !== undefined) {
+						ide.droppedText(localStorage.getItem("RIAClibrary"), "RIAC");
+					} else {
+						alert("Cannot load RIAC library");
+					}
+				}).then(loadAutosave);
+		} else {
+			loadAutosave();
+		}
 	}
-}
 
-function hasProjectPath() {
-	try {
-		return window.frameElement && window.frameElement.getAttribute("project_path");
-	} catch (e) {
-		return false;
+	function loadAutosave() {
+		var ide = world.children[0];
+		var storedProject = localStorage.getItem("snapIDE" + autosavePath());
+		if (storedProject) {
+			askYesNo("Load project?", "Do you want to load the project you were working on?",
+				function (button) {
+					// Must delay autosave until after a selection is made, otherwise empty project will be auto saved.
+					if (button) {
+						ide.openProjectString(storedProject, startAutosave);
+					} else {
+						load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+						startAutosave();
+					}
+				});
+		} else {
+			load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+			startAutosave();
+		}
 	}
-}
+
+	/**
+	 * Start project autosave every 15 seconds.
+	 */
+	function startAutosave() {
+		var saveInterval = setInterval(function () {
+			var ide = world.children[0];
+			var xml = ide.serializer.serialize(new Project(ide.scenes, ide.scene));
+			localStorage.setItem("snapIDE" + autosavePath(), xml);
+		}, 15000);
+	}
+
+	function autosavePath() {
+		if (hasProjectPath()) {
+			var projectPath = window.frameElement.getAttribute("project_path");
+			return "snapIDE" + projectPath;
+		} else {
+			return "snapIDE" + window.location.href;
+		}
+	}
+
+	function hasProjectPath() {
+		try {
+			return window.frameElement && window.frameElement.getAttribute("project_path");
+		} catch (e) {
+			return false;
+		}
+	}
+});
