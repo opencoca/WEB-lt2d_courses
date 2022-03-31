@@ -99,9 +99,9 @@
     <canvas id="world" tabindex="1" style="position: absolute;"></canvas>
   </body>
     <script>
-      //SpriteMorph.prototype.customCategories.set("RIAC",new Color(216,45,45));
-      //SpriteMorph.prototype.customCategories.set("eBrain",new Color(33,33,33));
-      //SpriteMorph.prototype.customCategories.set("Advanced eBrain",new Color(0,116,143));
+      SpriteMorph.prototype.customCategories.set("RIAC",new Color(216,45,45));
+      SpriteMorph.prototype.customCategories.set("eBrain",new Color(33,33,33));
+      SpriteMorph.prototype.customCategories.set("Advanced eBrain",new Color(0,116,143));
       window.addEventListener("load", afterLoaded,false);
       var executed = false;
 
@@ -142,11 +142,85 @@
         ide.flatDesign();
         ide.setBlocksScale(1.2);
         ide.setPaletteWidth(235);
-        ide.cloud.url = 'https://snapproxy.robotinacan.com';
-        // loading the project or autosave happens in onload.js
+        // Only load library from github if NOT hosted
+        if (!hasProjectPath()) {
+          // Load in library from github
+          fetch("https://raw.githubusercontent.com/Robot-In-A-Can/eBrain-Snap/develop/RIAC%20Blocks.xml")
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('could not fetch RIAC blocks from github');
+            }
+            return response.text();
+          }).then(RIAClibrary => {
+            ide.droppedText(RIAClibrary, "RIAC");
+            localStorage.setItem("RIAClibrary", RIAClibrary);
+          }).catch(error => {
+            console.log('cannot load library from internet. Attempting load from cache');
+            if (localStorage.getItem("RIAClibrary") !== undefined) {
+              ide.droppedText(localStorage.getItem("RIAClibrary"), "RIAC");
+            } else {
+              alert("Cannot load RIAC library");
+            }
+          }).then(loadProject);
+        } else {
+          loadProject();
+        }
+        
+
         addToDemo();
       }
 
+      function loadProject() {
+        var ide = world.children[0];
+        var storedProject = localStorage.getItem("snapIDE" + autosavePath());
+        if (storedProject) {
+          askYesNo("Load project?", "Do you want to load the project you were working on?", 
+          function(button) {
+            // Must delay autosave until after a selection is made, otherwise empty project will be auto saved.
+            if (button) {
+              ide.openProjectString(storedProject, startAutosave);
+            } else {
+              load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+              startAutosave();
+            }
+          });
+        } else {
+          load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+          startAutosave();
+        }
+      }
+
+      /**
+       * Start project autosave every 15 seconds.
+       */
+      function startAutosave() {
+        var saveInterval = setInterval(function() {
+            var ide = world.children[0];
+            var xml = ide.serializer.serialize(new Project(ide.scenes, ide.scene));
+            localStorage.setItem("snapIDE" + autosavePath(), xml);
+        }, 15000);
+      }
+
+      function autosavePath() {
+        if (hasProjectPath()) {
+          var projectPath = window.frameElement.getAttribute("project_path");
+          return "snapIDE" + projectPath;
+        } else {
+          return "snapIDE" + window.location.href;
+        }
+      }
+
+      function hasProjectPath() {
+        try {
+         if (window.frameElement && window.frameElement.getAttribute("project_path")) {
+           return true;
+         } else {
+           return false;
+         }
+        } catch (e) {
+          return false;
+        }
+      }
       /**
        * Ask a question. When yes or no are clicked, the given
        * callback is called with the button state given as a boolean,
