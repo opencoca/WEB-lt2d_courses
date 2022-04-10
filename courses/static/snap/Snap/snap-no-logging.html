@@ -176,9 +176,9 @@
         if (storedProject) {
           askYesNo("Load project?", "Do you want to load the project you were working on?", 
           function(button) {
-            // Must delay autosave until after a selection is made, otherwise empty project will be auto saved.
+            // Note: must delay autosave until after a selection is made, otherwise empty project will be auto saved.
             if (button) {
-              ide.openProjectString(storedProject, startAutosave);
+              ide.openProjectString(storedProject, function(){startAutosave(); setFullscreen();});
             } else {
               load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
               startAutosave();

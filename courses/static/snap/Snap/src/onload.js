@@ -80,14 +80,7 @@ function load_project_path_if_exists() {
 					ide_morph.setLanguage(parameters.get('locale').replace('-', '_'));
 				}
 				ide_morph.rawOpenProjectString(project_text);
-				if (window.location.href.indexOf('editMode') >= 0) {
-					ide_morph.toggleAppMode(false);
-				} else if (full_screen) {
-					ide_morph.toggleAppMode(true);
-					if (run_full_screen) {
-						ide_morph.runScripts();
-					}
-				}
+				setFullscreen();
 				ide_morph.showMessage(""); // remove message
 // 				if (!show_palette && full_screen && edit_mode) {
 //                 ide_morph.setPaletteWidth(0);
@@ -108,6 +101,21 @@ function load_project_path_if_exists() {
 			}).catch(function (error) {
 				ide_morph.showMessage("Error fetching " + project_path + ": " + error.message);
 			});
+		}
+	}
+}
+
+function setFullscreen() {
+	let run_full_screen = window.location.href.indexOf('noRun') < 0;
+	run_full_screen = run_full_screen || window.frameElement.getAttribute("run_full_screen");
+	full_screen = run_full_screen || full_screen || window.frameElement.getAttribute("full_screen");
+
+	if (window.location.href.indexOf('editMode') >= 0) {
+		ide_morph.toggleAppMode(false);
+	} else if (full_screen) {
+		ide_morph.toggleAppMode(true);
+		if (run_full_screen) {
+			ide_morph.runScripts();
 		}
 	}
 }
