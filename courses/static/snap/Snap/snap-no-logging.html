@@ -142,6 +142,11 @@
         ide.flatDesign();
         ide.setBlocksScale(1.2);
         ide.setPaletteWidth(235);
+        try {
+          ide.cloud.url = 'https://snapproxy.robotinacan.com';
+        } catch (e) {
+          console.log("error setting the proxy url: " + e);
+        }
         // Only load library from github if NOT hosted
         if (!hasProjectPath()) {
           // Load in library from github
