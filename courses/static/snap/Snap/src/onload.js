@@ -64,6 +64,114 @@ window.addEventListener('load', function () {
 // 	window.addEventListener('load', loop);
 });
 
+/**
+ * Loads the library from either cache or github, loads the
+ * project from localstorage or the path if hosted, which then starts the autosave.
+ */
+function loadLibraryAndProject() {
+	// make fullscreen if needed. Running through onNextStep since it doesn't work otherwise
+	ide_morph.onNextStep = adjustFullscreen;
+	// Only load library from github if NOT hosted
+	if (!hasProjectPath()) {
+		// Load in library from github
+		fetch("https://raw.githubusercontent.com/Robot-In-A-Can/eBrain-Snap/develop/RIAC%20Blocks.xml")
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('could not fetch RIAC blocks from github');
+				}
+				return response.text();
+			}).then(RIAClibrary => {
+				ide.droppedText(RIAClibrary, "RIAC");
+				localStorage.setItem("RIAClibrary", RIAClibrary);
+			}).catch(error => {
+				console.log('cannot load library from internet. Attempting load from cache');
+				if (localStorage.getItem("RIAClibrary") !== undefined) {
+					ide.droppedText(localStorage.getItem("RIAClibrary"), "RIAC");
+				} else {
+					alert("Cannot load RIAC library");
+				}
+			}).then(loadProject);
+	} else {
+		loadProject();
+	}
+}
+
+/**
+ * Loads the project and starts autosave.
+ */
+function loadProject() {
+	var ide = world.children[0];
+	var storedProject = localStorage.getItem("snapIDE" + autosavePath());
+	if (storedProject) {
+		askYesNo("Load project?", "Do you want to load the project you were working on?",
+			function (button) {
+				// Note: must delay autosave until after a selection is made, otherwise empty project will be auto saved.
+				if (button) {
+					ide.openProjectString(storedProject, function () { startAutosave(); adjustFullscreen(); });
+				} else {
+					load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+					startAutosave();
+				}
+			});
+	} else {
+		load_project_path_if_exists(); // Attempt to load project from the iframe parameter.
+		startAutosave();
+	}
+}
+
+/**
+ * Start project autosave every 15 seconds.
+ */
+function startAutosave() {
+	var saveInterval = setInterval(function () {
+		var ide = world.children[0];
+		var xml = ide.serializer.serialize(new Project(ide.scenes, ide.scene));
+		localStorage.setItem("snapIDE" + autosavePath(), xml);
+	}, 15000);
+}
+
+/**
+ * @returns The key where the project is autosaved.
+ */
+function autosavePath() {
+	if (hasProjectPath()) {
+		var projectPath = window.frameElement.getAttribute("project_path");
+		return "snapIDE" + projectPath;
+	} else {
+		return "snapIDE" + window.location.href;
+	}
+}
+
+function hasProjectPath() {
+	try {
+		return window.frameElement && window.frameElement.getAttribute("project_path");
+	} catch (e) {
+		return false;
+	}
+}
+/**
+ * Ask a question. When yes or no are clicked, the given
+ * callback is called with the button state given as a boolean,
+ * and the box is closed.
+ * Pops up with a delay to ensure it actually is shown.
+ */
+function askYesNo(title, message, callback) {
+	let box = new DialogBoxMorph();
+	// The function askYesNo below creates buttons that
+	// call these functions, ok and cancel.
+	box.ok = function () {
+		callback(true);
+		box.accept();
+	}
+	box.cancel = function () {
+		callback(false);
+		box.destroy();
+	}
+	setTimeout(function () {
+		box.askYesNo(title, message, world);
+	}, 400);
+}
+
 function load_project_path_if_exists() {
 	const load_project_string =
 		function (project_text) {
@@ -80,7 +188,7 @@ function load_project_path_if_exists() {
 					ide_morph.setLanguage(parameters.get('locale').replace('-', '_'));
 				}
 				ide_morph.rawOpenProjectString(project_text);
-				setFullscreen();
+				adjustFullscreen(); // opening a project pushes us out of fullscreen
 				ide_morph.showMessage(""); // remove message
 // 				if (!show_palette && full_screen && edit_mode) {
 //                 ide_morph.setPaletteWidth(0);
@@ -105,7 +213,7 @@ function load_project_path_if_exists() {
 	}
 }
 
-function setFullscreen() {
+function adjustFullscreen() {
 	let run_full_screen = window.location.href.indexOf('noRun') < 0;
 	run_full_screen = run_full_screen || window.frameElement.getAttribute("run_full_screen");
 	full_screen = run_full_screen || full_screen || window.frameElement.getAttribute("full_screen");
