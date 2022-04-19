@@ -60,12 +60,14 @@ window.addEventListener('load', function () {
 			fetch_and_load(project_path);
 		}
 	}
+	console.log("about to load library and project");
+	loadLibraryAndProject();
 	loop();
 // 	window.addEventListener('load', loop);
 });
 
 /**
- * Loads the library from either cache or github, loads the
+ * Loads the library from either cache or github (only if not hosted), loads the
  * project from localstorage or the path if hosted, which then starts the autosave.
  */
 function loadLibraryAndProject() {

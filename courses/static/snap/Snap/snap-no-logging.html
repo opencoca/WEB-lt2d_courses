@@ -141,7 +141,20 @@
         ide.flatDesign();
         ide.setBlocksScale(1.2);
         ide.setPaletteWidth(235);
-        loadLibraryAndProject();
+        ide_morph.onNextStep = function() {
+          let run_full_screen = window.location.href.indexOf('noRun') < 0;
+          run_full_screen = run_full_screen || window.frameElement.getAttribute("run_full_screen");
+          full_screen = run_full_screen || full_screen || window.frameElement.getAttribute("full_screen");
+
+          if (window.location.href.indexOf('editMode') >= 0) {
+            ide_morph.toggleAppMode(false);
+          } else if (full_screen) {
+            ide_morph.toggleAppMode(true);
+            if (run_full_screen) {
+              ide_morph.runScripts();
+            }
+          }
+        }
         // this set the cors proxy for snap cloud. Does not currently work
         // due to their security policies.
         /*try {
